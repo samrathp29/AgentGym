@@ -1,0 +1,71 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import type { LiveStage } from "@/lib/types";
+
+type RunControlsProps = {
+  running: boolean;
+  stage: LiveStage | null;
+  canRun: boolean;
+  onRun: () => void;
+  onCompare: () => void;
+  onCopy: () => void;
+  copied: boolean;
+};
+
+const STAGES: LiveStage[] = [
+  "Generating customer turn",
+  "Agent responding",
+  "Checking policy",
+  "Grading assertions",
+];
+
+export function RunControls({
+  running,
+  stage,
+  canRun,
+  onRun,
+  onCompare,
+  onCopy,
+  copied,
+}: RunControlsProps) {
+  return (
+    <div className="border-t border-[var(--border)] bg-white/90 px-4 py-3 sm:px-5">
+      {running ? (
+        <ol className="mb-3 flex flex-wrap gap-2">
+          {STAGES.map((item) => {
+            const active = stage === item;
+            const idx = STAGES.indexOf(item);
+            const current = stage ? STAGES.indexOf(stage) : -1;
+            const done = current > idx;
+            return (
+              <li
+                key={item}
+                className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                  active
+                    ? "bg-[var(--lavender)] text-[var(--violet)]"
+                    : done
+                      ? "bg-[#e5f4ee] text-[var(--success)]"
+                      : "bg-[var(--background)] text-[var(--muted)]"
+                }`}
+              >
+                {item}
+              </li>
+            );
+          })}
+        </ol>
+      ) : null}
+      <div className="flex flex-wrap items-center gap-2">
+        <Button onClick={onRun} disabled={!canRun || running}>
+          {running ? "Running live test…" : "Run live test"}
+        </Button>
+        <Button variant="secondary" onClick={onCompare}>
+          Compare versions
+        </Button>
+        <Button variant="ghost" onClick={onCopy}>
+          {copied ? "Copied" : "Copy result summary"}
+        </Button>
+      </div>
+    </div>
+  );
+}

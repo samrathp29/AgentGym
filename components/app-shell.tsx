@@ -1,0 +1,29 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { AboutPanel } from "@/components/about-panel";
+import { Header } from "@/components/header";
+import { Hero } from "@/components/hero";
+import { Workspace } from "@/components/workspace";
+
+export function AppShell() {
+  const [about, setAbout] = useState(false);
+
+  useEffect(() => {
+    if (!about) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setAbout(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [about]);
+
+  return (
+    <>
+      <Header onOpenAbout={() => setAbout(true)} />
+      <Hero onOpenAbout={() => setAbout(true)} />
+      <Workspace />
+      <AboutPanel open={about} onClose={() => setAbout(false)} />
+    </>
+  );
+}

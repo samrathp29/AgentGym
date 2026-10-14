@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f7fb;
+  --ink: #191725;
+  --muted: #79758a;
+  --violet: #6555e8;
+  --lavender: #edebff;
+  --border: #e8e5f0;
+  --success: #16876a;
+  --failure: #d15b66;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-violet: var(--violet);
+  --color-lavender: var(--lavender);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-failure: var(--failure);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 3px;
+}
+
+summary {
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+@keyframes trace-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.trace-event {
+  animation: trace-in 200ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-event {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
