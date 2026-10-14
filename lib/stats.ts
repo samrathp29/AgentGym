@@ -23,14 +23,21 @@ export function formatPassRate(rate: number): string {
   return `${Math.round(rate * 100)}%`;
 }
 
+function displayRuntime(model: string): string {
+  if (model.toLowerCase().includes("example") || model === "sample") {
+    return "curated example harness";
+  }
+  return "AgentGym reasoning runtime";
+}
+
 export function copySummary(run: EvalRun): string {
   const failed = run.assertions.filter((assertion) => !assertion.passed);
   const lines = [
-    "AgentGym · Aster Audio refund desk",
+    "AgentGym · Aster Audio closed-loop eval",
     `Case: ${run.caseId}`,
-    `Policy: ${run.version} · ${run.source === "example" ? "Example run" : "Live run"}`,
+    `Prompt regime: ${run.version} · ${run.source === "example" ? "Curated example" : "Live evaluation"}`,
     `Status: ${run.status.toUpperCase()}`,
-    `Model: ${run.model}`,
+    `Runtime: ${displayRuntime(run.model)}`,
     run.durationMs ? `Duration: ${run.durationMs}ms` : null,
     `Assertions: ${run.assertions.filter((assertion) => assertion.passed).length}/${run.assertions.length} passed`,
     failed.length > 0

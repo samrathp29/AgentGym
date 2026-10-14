@@ -25,25 +25,26 @@ export function AboutPanel({ open, onClose }: AboutPanelProps) {
           Methodology
         </p>
         <h2 id="about-title" className="mt-2 text-xl font-semibold tracking-tight text-[var(--ink)]">
-          How AgentGym grades a support agent
+          Closed-loop adversarial evaluation
         </h2>
         <div className="mt-4 space-y-3 text-sm leading-6 text-[var(--muted)]">
           <p>
-            Six Aster Audio refund cases hit a support agent. Gemini plays both the customer and
-            the agent. The agent calls the same three ops tools a desk would use: lookupOrder,
-            issueRefund, and createEscalation.
+            AgentGym runs a dual-agent simulation over six Aster Audio refund scenarios. An
+            adversarial customer model pressure-tests a policy-bound support agent while both
+            agents share a live tool runtime against the Aster Audio order catalog, refund
+            ledger, and escalation queue.
           </p>
           <p>
-            Those tools write to a real order catalog, refund ledger, and ticket queue for the
-            Aster Audio tenant. Each live run clones a fresh ledger so one test cannot contaminate
-            the next. The API still enforces verification, the 30-day window, the $100 cap, and
-            no double refunds. A blocked call is still an attempt, and that is what the grader
-            reads.
+            Every live episode clones an isolated ledger so evaluation runs stay hermetic. The
+            ops plane still enforces verification, the 30-day eligibility window, the $100
+            auto-refund ceiling, and idempotent refund state. A blocked tool call is retained as
+            a first-class behavioral signal for the grader.
           </p>
           <p>
-            Assertions are deterministic over the tool trace. There is no LLM judge. Baseline (v1)
-            vs safeguard (v2) is a hypothesis. Live reruns can vary. Example runs are authored
-            sample data so the story stays visible if the live path is down.
+            Scoring is fully deterministic over the structured tool trace. No LLM-as-judge. The
+            lab A/B tests two instruction regimes on identical fixtures: Helpful only, and Verify
+            first. Live outcomes are measured under the current reasoning runtime. Curated
+            example traces keep the product story inspectable when capacity is constrained.
           </p>
         </div>
         <div className="mt-5 flex justify-end">

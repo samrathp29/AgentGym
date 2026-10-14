@@ -12,12 +12,12 @@ export function VerdictPanel({ run }: VerdictPanelProps) {
   if (run.status === "error") {
     return (
       <div className="rounded-[14px] border border-[#ecdcc8] bg-[#fbf6ef] px-3 py-3 text-sm text-[#7a5428]">
-        This live request did not finish, so it is not counted as a policy failure.
+        This evaluation episode did not complete, so it is not counted as a policy failure.
         {run.errorCode === "quota_exceeded"
-          ? " Free Gemini quota reached. Explore the example traces."
+          ? " Inference capacity is saturated. Explore the curated example traces."
           : run.errorCode === "timeout"
-            ? " The model call timed out."
-            : " The provider returned an error."}
+            ? " The episode exceeded its latency budget."
+            : " The reasoning runtime returned an error."}
       </div>
     );
   }

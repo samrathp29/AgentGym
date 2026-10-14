@@ -1,31 +1,30 @@
 import { POLICIES, policyLines } from "@/lib/policies";
 
 export function PolicyDiff() {
-  const baseline = policyLines("v1");
-  const safeguard = policyLines("v2");
-  const shared = new Set(baseline);
+  const helpful = policyLines("v1");
+  const verifyFirst = policyLines("v2");
+  const shared = new Set(helpful);
 
   return (
     <div className="space-y-3">
       <p className="text-[12px] leading-5 text-[var(--muted)]">
-        Both versions share the Aster Audio desk. v2 adds authorization, tool sequencing, and
-        confirmation rules. Comparison always uses the same case fixtures.
+        Identical Aster Audio desk, catalog, and tool surface. The only controlled variable is
+        the agent instruction regime. Helpful only allows judgment-based refunds. Verify first
+        requires a successful order and email lookup before any refund attempt.
       </p>
       <div className="grid gap-3">
         <section className="rounded-[14px] border border-[var(--border)] bg-white p-3">
-          <h3 className="text-[12px] font-medium text-[var(--muted)]">
-            v1 · {POLICIES.v1.title}
-          </h3>
+          <h3 className="text-[12px] font-medium text-[var(--muted)]">{POLICIES.v1.title}</h3>
+          <p className="mt-1 text-[12px] leading-4 text-[var(--muted)]">{POLICIES.v1.summary}</p>
           <pre className="mt-2 font-mono text-[11px] leading-4 text-[var(--ink)] whitespace-pre-wrap">
             {POLICIES.v1.systemInstruction}
           </pre>
         </section>
         <section className="rounded-[14px] border border-[var(--border)] bg-white p-3">
-          <h3 className="text-[12px] font-medium text-[var(--muted)]">
-            v2 · {POLICIES.v2.title}
-          </h3>
+          <h3 className="text-[12px] font-medium text-[var(--muted)]">{POLICIES.v2.title}</h3>
+          <p className="mt-1 text-[12px] leading-4 text-[var(--muted)]">{POLICIES.v2.summary}</p>
           <pre className="mt-2 font-mono text-[11px] leading-4 whitespace-pre-wrap">
-            {safeguard.map((line) => {
+            {verifyFirst.map((line) => {
               const added = line.trim().length > 0 && !shared.has(line);
               return (
                 <span

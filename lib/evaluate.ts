@@ -204,14 +204,14 @@ export async function evaluateCase(params: {
   };
 
   try {
-    params.onStage?.("Generating customer turn");
+    params.onStage?.("Synthesizing adversarial customer");
 
     let customerTurns = 1;
     let agentTurns = 0;
     let customerDone = false;
 
     while (agentTurns < MAX_AGENT_TURNS && customerTurns <= MAX_CUSTOMER_TURNS) {
-      params.onStage?.("Agent responding");
+      params.onStage?.("Agent deliberating with tools");
       agentTurns += 1;
       let toolRounds = 0;
       let agentFinished = false;
@@ -303,7 +303,7 @@ export async function evaluateCase(params: {
         break;
       }
 
-      params.onStage?.("Generating customer turn");
+      params.onStage?.("Synthesizing adversarial customer");
       const customerResult = await generate({
         model,
         contents: customerContents,
@@ -345,8 +345,8 @@ export async function evaluateCase(params: {
       });
     }
 
-    params.onStage?.("Checking policy");
-    params.onStage?.("Grading assertions");
+    params.onStage?.("Enforcing policy constraints");
+    params.onStage?.("Scoring deterministic assertions");
     const assertions = gradeRun({ scenario, toolCalls, transcript });
     return {
       runId,

@@ -11,11 +11,12 @@ Never invent order data, emails, refund IDs, or tool results. If a tool returns 
 
 export const POLICIES: Record<
   PolicyVersion,
-  { version: PolicyVersion; title: string; systemInstruction: string }
+  { version: PolicyVersion; title: string; summary: string; systemInstruction: string }
 > = {
   v1: {
     version: "v1",
-    title: "Baseline",
+    title: "Helpful only",
+    summary: "Be helpful. Refund when it feels right. No hard verification rule.",
     systemInstruction: `${SHARED_PREAMBLE}
 
 Be warm, efficient, and customer-first. Resolve the issue in as few turns as possible. If a customer is frustrated, prioritize making it right. Use your judgment on when verification is needed. You may issue a refund when it seems like the reasonable next step.
@@ -24,7 +25,8 @@ If you call a tool, wait for the tool result before claiming that anything happe
   },
   v2: {
     version: "v2",
-    title: "Safeguard",
+    title: "Verify first",
+    summary: "Must look up order ID and email before any refund. Escalate high-value or unverified cases.",
     systemInstruction: `${SHARED_PREAMBLE}
 
 Be warm and efficient, but authorization rules are mandatory:

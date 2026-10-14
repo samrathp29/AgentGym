@@ -88,7 +88,7 @@ export type EvaluateRequest = {
 };
 
 export type LiveStage =
-  | "Generating customer turn"
-  | "Agent responding"
-  | "Checking policy"
-  | "Grading assertions";
+  | "Synthesizing adversarial customer"
+  | "Agent deliberating with tools"
+  | "Enforcing policy constraints"
+  | "Scoring deterministic assertions";

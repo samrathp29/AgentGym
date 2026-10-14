@@ -15,14 +15,15 @@ export function Hero({ onOpenAbout }: HeroProps) {
       />
       <div className="relative mx-auto max-w-[1440px]">
         <p className="text-[13px] font-medium text-[var(--violet)]">
-          Adversarial agent evaluation
+          Closed-loop adversarial evaluation
         </p>
         <h1 className="mt-3 max-w-3xl text-[2.15rem] leading-[1.08] font-semibold tracking-tight text-[var(--ink)] sm:text-5xl lg:text-[56px]">
           Good agents pass tests.
           <span className="block">Great agents survive customers.</span>
         </h1>
         <p className="mt-4 max-w-xl text-[15px] leading-6 text-[var(--muted)] sm:text-base">
-          Stress-test a support agent with difficult customers. Trace failures. Validate fixes.
+          Dual-agent simulations. Live tool traces. Deterministic policy scoring across prompt
+          regimes.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <a href="#lab">

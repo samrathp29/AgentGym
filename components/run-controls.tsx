@@ -14,10 +14,10 @@ type RunControlsProps = {
 };
 
 const STAGES: LiveStage[] = [
-  "Generating customer turn",
-  "Agent responding",
-  "Checking policy",
-  "Grading assertions",
+  "Synthesizing adversarial customer",
+  "Agent deliberating with tools",
+  "Enforcing policy constraints",
+  "Scoring deterministic assertions",
 ];
 
 export function RunControls({
@@ -57,10 +57,10 @@ export function RunControls({
       ) : null}
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={onRun} disabled={!canRun || running}>
-          {running ? "Running live test…" : "Run live test"}
+          {running ? "Running evaluation…" : "Run evaluation"}
         </Button>
         <Button variant="secondary" onClick={onCompare}>
-          Compare versions
+          Compare prompts
         </Button>
         <Button variant="ghost" onClick={onCopy}>
           {copied ? "Copied" : "Copy result summary"}

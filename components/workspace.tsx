@@ -9,6 +9,7 @@ import { VerdictPanel } from "@/components/verdict-panel";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { getExampleRun, listExampleRuns } from "@/lib/example-runs";
+import { POLICIES } from "@/lib/policies";
 import { isCaseId, listScenarios } from "@/lib/scenarios";
 import { copySummary, computeStats, formatPassRate } from "@/lib/stats";
 import type {
@@ -23,10 +24,10 @@ type RunMode = "example" | "live";
 type InspectorTab = "verdict" | "policy" | "trace";
 
 const STAGES: LiveStage[] = [
-  "Generating customer turn",
-  "Agent responding",
-  "Checking policy",
-  "Grading assertions",
+  "Synthesizing adversarial customer",
+  "Agent deliberating with tools",
+  "Enforcing policy constraints",
+  "Scoring deterministic assertions",
 ];
 
 function liveKey(version: PolicyVersion, caseId: CaseId) {
@@ -53,15 +54,15 @@ function isEvalRun(value: unknown): value is EvalRun {
 
 function errorCopy(code: ErrorCode | undefined): string {
   if (code === "quota_exceeded") {
-    return "Free Gemini quota reached. Explore the example traces.";
+    return "Inference capacity is saturated. Explore the curated example traces.";
   }
   if (code === "timeout") {
-    return "The live test timed out. The example trace is still available.";
+    return "The evaluation episode exceeded its latency budget. The example trace is still available.";
   }
   if (code === "invalid_output") {
-    return "The model returned output we could not parse. Try once more, or stay on the example.";
+    return "The reasoning runtime returned an unparseable payload. Retry once, or stay on the example.";
   }
-  return "The live test could not reach Gemini. The labeled example remains browseable.";
+  return "The evaluation runtime is temporarily unreachable. Curated examples remain fully browseable.";
 }
 
 export function Workspace() {
@@ -95,7 +96,7 @@ export function Workspace() {
     setRunning(true);
     setError(null);
     setMode("live");
-    setStage("Generating customer turn");
+    setStage("Synthesizing adversarial customer");
     try {
       const response = await fetch("/api/evaluate-case", {
         method: "POST",
@@ -189,24 +190,27 @@ export function Workspace() {
                     mode === item ? "bg-white text-[var(--ink)] shadow-sm" : "text-[var(--muted)]",
                   )}
                 >
-                  {item === "example" ? "Example run" : "Live run"}
+                  {item === "example" ? "Curated trace" : "Live evaluation"}
                 </button>
               ))}
             </div>
-            <div className="flex rounded-full bg-[var(--background)] p-1">
-              {(["v1", "v2"] as const).map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => setVersion(item)}
-                  className={cn(
-                    "rounded-full px-3 py-1 text-[12px] font-medium",
-                    version === item ? "bg-white text-[var(--ink)] shadow-sm" : "text-[var(--muted)]",
-                  )}
-                >
-                  {item === "v1" ? "v1 baseline" : "v2 safeguard"}
-                </button>
-              ))}
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+              <div className="flex rounded-full bg-[var(--background)] p-1">
+                {(["v1", "v2"] as const).map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setVersion(item)}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-[12px] font-medium",
+                      version === item ? "bg-white text-[var(--ink)] shadow-sm" : "text-[var(--muted)]",
+                    )}
+                  >
+                    {POLICIES[item].title}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[12px] leading-4 text-[var(--muted)]">{POLICIES[version].summary}</p>
             </div>
           </div>
           <dl className="flex gap-5 text-[12px]">
@@ -252,7 +256,7 @@ export function Workspace() {
           <div className="min-w-0 border-b border-[var(--border)] p-4 lg:border-r lg:border-b-0">
             <ConversationTrace
               run={selectedRun}
-              emptyLabel="No live result yet for this case. Run a live test, or switch back to the labeled example."
+              emptyLabel="No live episode yet for this case. Run an evaluation, or switch back to the curated trace."
               skipMotion={skipMotion}
               onSkipMotion={() => setSkipMotion(true)}
             />
@@ -312,16 +316,22 @@ export function Workspace() {
             onClick={(event) => event.stopPropagation()}
           >
             <h2 id="compare-title" className="text-lg font-semibold text-[var(--ink)]">
-              Compare versions · {scenarios.find((item) => item.id === caseId)?.name}
+              Compare prompts · {scenarios.find((item) => item.id === caseId)?.name}
             </h2>
             <p className="mt-1 text-sm text-[var(--muted)]">
-              Same fixtures. {mode === "example" ? "Example results." : "Live results where available, example otherwise."}
+              Same customer, same order. Different instruction regimes.
+              {mode === "example"
+                ? " Curated results."
+                : " Live results where available, curated otherwise."}
             </p>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {[v1, v2].map((run) => (
                 <section key={run.runId} className="rounded-[16px] border border-[var(--border)] p-3">
                   <p className="text-[12px] font-medium text-[var(--muted)]">
-                    {run.version} · {run.status}
+                    {POLICIES[run.version].title} · {run.status}
+                  </p>
+                  <p className="mt-1 text-[12px] leading-4 text-[var(--muted)]">
+                    {POLICIES[run.version].summary}
                   </p>
                   <ul className="mt-2 space-y-1.5 text-[13px]">
                     {run.assertions.map((assertion) => (

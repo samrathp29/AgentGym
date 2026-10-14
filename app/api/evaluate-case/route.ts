@@ -52,7 +52,7 @@ export async function POST(request: Request) {
         durationMs: 0,
         model: process.env["GEMINI_MODEL"] ?? "gemini-3.8-flash",
         errorCode: "quota_exceeded",
-        message: `Live tests are limited to one at a time. Try again in ${limit.retryAfterSec}s, or explore the example traces.`,
+        message: `Live evaluations are limited to one concurrent episode. Retry in ${limit.retryAfterSec}s, or explore the curated example traces.`,
       } satisfies EvalRun & { message: string },
       {
         status: 429,
