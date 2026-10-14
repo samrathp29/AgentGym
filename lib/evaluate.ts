@@ -2,7 +2,12 @@ import "server-only";
 
 import { Type, type Content, type FunctionCall, type Part } from "@google/genai";
 import { gradeRun, runStatusFromAssertions } from "@/lib/assertions";
-import { getGeminiClient, getModelName, TOOL_DECLARATIONS } from "@/lib/gemini";
+import {
+  FALLBACK_MODELS,
+  getGeminiClient,
+  getModelName,
+  TOOL_DECLARATIONS,
+} from "@/lib/gemini";
 import {
   createToolSession,
   executeTool,
@@ -59,6 +64,17 @@ function mapError(error: unknown): ErrorCode {
   if (error instanceof Error && error.name === "AbortError") return "timeout";
   if (/timeout|aborted/i.test(message)) return "timeout";
   return "provider_error";
+}
+
+function isRetryableModelError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  const status =
+    isRecord(error) && typeof error.status === "number" ? error.status : undefined;
+  return (
+    status === 404 ||
+    status === 503 ||
+    /404|503|NOT_FOUND|UNAVAILABLE|no longer available|high demand/i.test(message)
+  );
 }
 
 function customerInstruction(params: {
@@ -124,7 +140,7 @@ export async function evaluateCase(params: {
 }): Promise<EvalRun> {
   const started = Date.now();
   const scenario = getScenario(params.caseId);
-  const model = getModelName();
+  let model = getModelName();
   const runId = `live_${params.caseId}_${params.version}_${started.toString(36)}`;
   const transcript: TranscriptEvent[] = [
     { role: "customer", text: scenario.openingMessage },
@@ -164,14 +180,27 @@ export async function evaluateCase(params: {
       abortError.name = "AbortError";
       throw abortError;
     }
-    return client.models.generateContent({
-      ...args,
-      config: {
-        thinkingConfig: { thinkingBudget: 0 },
-        ...args.config,
-        abortSignal: params.signal,
-      },
-    });
+    const candidates = [...new Set([model, ...FALLBACK_MODELS])];
+    let lastError: unknown;
+    for (const candidate of candidates) {
+      try {
+        const result = await client.models.generateContent({
+          ...args,
+          model: candidate,
+          config: {
+            thinkingConfig: { thinkingBudget: 0 },
+            ...args.config,
+            abortSignal: params.signal,
+          },
+        });
+        model = candidate;
+        return result;
+      } catch (error) {
+        lastError = error;
+        if (!isRetryableModelError(error)) throw error;
+      }
+    }
+    throw lastError;
   };
 
   try {

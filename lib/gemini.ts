@@ -4,6 +4,8 @@ import { GoogleGenAI, Type, type FunctionDeclaration } from "@google/genai";
 
 export const DEFAULT_MODEL = "gemini-3.8-flash";
 
+export const FALLBACK_MODELS = ["gemini-3.5-flash", "gemini-3.1-flash-lite"] as const;
+
 export function getModelName(): string {
   return process.env["GEMINI_MODEL"]?.trim() || DEFAULT_MODEL;
 }
