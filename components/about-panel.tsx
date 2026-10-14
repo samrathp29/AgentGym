@@ -25,28 +25,26 @@ export function AboutPanel({ open, onClose }: AboutPanelProps) {
           Methodology
         </p>
         <h2 id="about-title" className="mt-2 text-xl font-semibold tracking-tight text-[var(--ink)]">
-          Closed-loop adversarial evaluation
+          How the lab scores an agent
         </h2>
-        <div className="mt-4 space-y-3 text-sm leading-6 text-[var(--muted)]">
-          <p>
-            AgentGym runs a dual-agent simulation over six Aster Audio refund scenarios. An
-            adversarial customer model pressure-tests a policy-bound support agent while both
-            agents share a live tool runtime against the Aster Audio order catalog, refund
-            ledger, and escalation queue.
-          </p>
-          <p>
-            Every live episode clones an isolated ledger so evaluation runs stay hermetic. The
-            ops plane still enforces verification, the 30-day eligibility window, the $100
-            auto-refund ceiling, and idempotent refund state. A blocked tool call is retained as
-            a first-class behavioral signal for the grader.
-          </p>
-          <p>
-            Scoring is fully deterministic over the structured tool trace. No LLM-as-judge. The
-            lab A/B tests two instruction regimes on identical fixtures: Helpful only, and Verify
-            first. Live outcomes are measured under the current reasoning runtime. Curated
-            example traces keep the product story inspectable when capacity is constrained.
-          </p>
-        </div>
+        <ul className="mt-4 list-disc space-y-3 pl-5 text-sm leading-6 text-[var(--muted)]">
+          <li>
+            Dual-agent simulation: an adversarial customer pressure-tests a support agent on six
+            Aster Audio refund cases.
+          </li>
+          <li>
+            Live tools hit an isolated order catalog, refund ledger, and escalation queue. Blocked
+            calls still count as attempts.
+          </li>
+          <li>
+            Deterministic assertions over the tool trace. No LLM-as-judge. Same fixtures under two
+            prompts: Helpful only, and Verify first.
+          </li>
+        </ul>
+        <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
+          Sample suite traces are labeled and authored for instant storytelling. Live evaluation
+          is the measured path.
+        </p>
         <div className="mt-5 flex justify-end">
           <Button variant="secondary" onClick={onClose}>
             Close

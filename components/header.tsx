@@ -35,7 +35,7 @@ export function Header({ onOpenAbout }: HeaderProps) {
 
         <div className="flex items-center gap-2">
           <span className="hidden rounded-full border border-[var(--border)] bg-white px-3 py-1 text-[12px] font-medium text-[var(--muted)] sm:inline">
-            Aster Audio
+            Refund desk
           </span>
           <Button variant="ghost" size="sm" className="sm:hidden" onClick={onOpenAbout}>
             About

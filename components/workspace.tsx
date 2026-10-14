@@ -54,15 +54,15 @@ function isEvalRun(value: unknown): value is EvalRun {
 
 function errorCopy(code: ErrorCode | undefined): string {
   if (code === "quota_exceeded") {
-    return "Inference capacity is saturated. Explore the curated example traces.";
+    return "Inference capacity is saturated. Explore the sample suite.";
   }
   if (code === "timeout") {
-    return "The evaluation episode exceeded its latency budget. The example trace is still available.";
+    return "The evaluation episode exceeded its latency budget. The sample suite is still available.";
   }
   if (code === "invalid_output") {
-    return "The reasoning runtime returned an unparseable payload. Retry once, or stay on the example.";
+    return "The reasoning runtime returned an unparseable payload. Retry once, or stay on the sample suite.";
   }
-  return "The evaluation runtime is temporarily unreachable. Curated examples remain fully browseable.";
+  return "The evaluation runtime is temporarily unreachable. The sample suite remains fully browseable.";
 }
 
 export function Workspace() {
@@ -179,54 +179,66 @@ export function Workspace() {
       <div className="mx-auto max-w-[1440px] overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--background)]">
         <div className="flex flex-col gap-3 border-b border-[var(--border)] bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-full bg-[var(--background)] p-1">
-              {(["example", "live"] as const).map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => setMode(item)}
-                  className={cn(
-                    "rounded-full px-3 py-1 text-[12px] font-medium",
-                    mode === item ? "bg-white text-[var(--ink)] shadow-sm" : "text-[var(--muted)]",
-                  )}
-                >
-                  {item === "example" ? "Curated trace" : "Live evaluation"}
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-              <div className="flex rounded-full bg-[var(--background)] p-1">
-                {(["v1", "v2"] as const).map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setVersion(item)}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-[12px] font-medium",
-                      version === item ? "bg-white text-[var(--ink)] shadow-sm" : "text-[var(--muted)]",
-                    )}
-                  >
-                    {POLICIES[item].title}
-                  </button>
-                ))}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex rounded-full bg-[var(--background)] p-1">
+                  {(["example", "live"] as const).map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setMode(item)}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-[12px] font-medium",
+                        mode === item ? "bg-white text-[var(--ink)] shadow-sm" : "text-[var(--muted)]",
+                      )}
+                    >
+                      {item === "example" ? "Sample suite" : "Live episode"}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex rounded-full bg-[var(--background)] p-1">
+                  {(["v1", "v2"] as const).map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setVersion(item)}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-[12px] font-medium",
+                        version === item ? "bg-white text-[var(--ink)] shadow-sm" : "text-[var(--muted)]",
+                      )}
+                    >
+                      {POLICIES[item].title}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="text-[12px] leading-4 text-[var(--muted)]">{POLICIES[version].summary}</p>
+              <p className="text-[12px] leading-4 text-[var(--muted)]">
+                {mode === "example"
+                  ? "Labeled sample data for instant storytelling."
+                  : "Measured dual-agent run against the live tool runtime."}{" "}
+                {POLICIES[version].summary}
+              </p>
             </div>
           </div>
-          <dl className="flex gap-5 text-[12px]">
-            <div>
-              <dt className="text-[var(--muted)]">Pass rate</dt>
-              <dd className="font-semibold text-[var(--ink)]">{formatPassRate(stats.passRate)}</dd>
-            </div>
-            <div>
-              <dt className="text-[var(--muted)]">Failed assertions</dt>
-              <dd className="font-semibold text-[var(--ink)]">{stats.failedAssertions}</dd>
-            </div>
-            <div>
-              <dt className="text-[var(--muted)]">Total tests</dt>
-              <dd className="font-semibold text-[var(--ink)]">{stats.totalTests}</dd>
-            </div>
-          </dl>
+          <div className="sm:text-right">
+            <dl className="flex gap-5 text-[12px]">
+              <div>
+                <dt className="text-[var(--muted)]">Pass rate</dt>
+                <dd className="font-semibold text-[var(--ink)]">{formatPassRate(stats.passRate)}</dd>
+              </div>
+              <div>
+                <dt className="text-[var(--muted)]">Failed assertions</dt>
+                <dd className="font-semibold text-[var(--ink)]">{stats.failedAssertions}</dd>
+              </div>
+              <div>
+                <dt className="text-[var(--muted)]">Total tests</dt>
+                <dd className="font-semibold text-[var(--ink)]">{stats.totalTests}</dd>
+              </div>
+            </dl>
+            <p className="mt-1 text-[11px] text-[var(--muted)]">
+              {POLICIES[version].title} · {mode === "example" ? "sample suite" : "live episodes"}
+            </p>
+          </div>
         </div>
 
         {error ? (
@@ -256,7 +268,7 @@ export function Workspace() {
           <div className="min-w-0 border-b border-[var(--border)] p-4 lg:border-r lg:border-b-0">
             <ConversationTrace
               run={selectedRun}
-              emptyLabel="No live episode yet for this case. Run an evaluation, or switch back to the curated trace."
+              emptyLabel="No live episode yet for this case. Run an evaluation, or switch back to the sample suite."
               skipMotion={skipMotion}
               onSkipMotion={() => setSkipMotion(true)}
             />
@@ -319,10 +331,10 @@ export function Workspace() {
               Compare prompts · {scenarios.find((item) => item.id === caseId)?.name}
             </h2>
             <p className="mt-1 text-sm text-[var(--muted)]">
-              Same customer, same order. Different instruction regimes.
+              Same customer, same order. Different prompts.
               {mode === "example"
-                ? " Curated results."
-                : " Live results where available, curated otherwise."}
+                ? " Sample suite results."
+                : " Live results where available, sample suite otherwise."}
             </p>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {[v1, v2].map((run) => (

@@ -65,6 +65,9 @@ export function RunControls({
         <Button variant="ghost" onClick={onCopy}>
           {copied ? "Copied" : "Copy result summary"}
         </Button>
+        <p className="w-full text-[12px] text-[var(--muted)] sm:ml-auto sm:w-auto">
+          Same fixtures under both prompts. Compare to see the delta.
+        </p>
       </div>
     </div>
   );

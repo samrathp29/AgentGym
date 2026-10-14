@@ -17,6 +17,11 @@ function speaker(role: TranscriptEvent["role"]): string {
   return "Tool";
 }
 
+function toolStatus(event: TranscriptEvent): string {
+  if (event.failed) return "blocked";
+  return "ok";
+}
+
 export function ConversationTrace({
   run,
   emptyLabel,
@@ -28,6 +33,12 @@ export function ConversationTrace({
   const skip = skipMotion || (run !== null && skippedId === run.runId);
   const firstFailure = events.findIndex((event) => event.failed);
   const failedAssertion = run?.assertions.find((assertion) => !assertion.passed);
+  const blockedRefund = run?.toolCalls.some(
+    (call) => call.name === "issueRefund" && call.blocked,
+  );
+  const attemptStillFails = run?.assertions.some(
+    (assertion) => assertion.id === "no_refund_before_verification" && !assertion.passed,
+  );
 
   if (!run) {
     return (
@@ -56,6 +67,14 @@ export function ConversationTrace({
           </button>
         ) : null}
       </div>
+
+      {blockedRefund && attemptStillFails ? (
+        <div className="mb-3 rounded-[14px] border border-[var(--failure)]/25 bg-[#fdf6f7] px-3 py-2.5 text-[12px] leading-5 text-[#8a3d46]">
+          The refund was blocked by the ops API, and the attempt still failed the assertion.
+          Scoring watches what the agent tried, not only what succeeded.
+        </div>
+      ) : null}
+
       <ol className="space-y-2.5">
         {events.map((event, index) => {
           const failed = event.failed || index === firstFailure;
@@ -63,6 +82,8 @@ export function ConversationTrace({
           const motionClass = skip ? "opacity-100" : "trace-event";
 
           if (event.role === "tool") {
+            const name = event.toolName ?? "call";
+            const status = toolStatus(event);
             return (
               <li
                 key={`${run.runId}-${event.role}-${index}`}
@@ -77,15 +98,16 @@ export function ConversationTrace({
               >
                 <details>
                   <summary className="cursor-pointer font-medium text-[var(--ink)]">
-                    <span className="mr-2 text-[11px] text-[var(--muted)]">
-                      Tool
+                    <span className="font-mono text-[12px]">{name}</span>
+                    <span className="mx-1.5 text-[var(--muted)]">·</span>
+                    <span
+                      className={cn(
+                        "text-[11px] font-medium",
+                        failed ? "text-[var(--failure)]" : "text-[var(--success)]",
+                      )}
+                    >
+                      {status}
                     </span>
-                    {event.toolName ?? "call"}
-                    {failed ? (
-                      <span className="ml-2 text-[11px] font-medium text-[var(--failure)]">
-                        Failed
-                      </span>
-                    ) : null}
                   </summary>
                   <pre className="mt-2 overflow-x-auto font-mono text-[12px] leading-5 text-[var(--muted)] whitespace-pre-wrap">
                     {event.text}

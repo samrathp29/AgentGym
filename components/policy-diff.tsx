@@ -8,9 +8,9 @@ export function PolicyDiff() {
   return (
     <div className="space-y-3">
       <p className="text-[12px] leading-5 text-[var(--muted)]">
-        Identical Aster Audio desk, catalog, and tool surface. The only controlled variable is
-        the agent instruction regime. Helpful only allows judgment-based refunds. Verify first
-        requires a successful order and email lookup before any refund attempt.
+        Same Aster Audio desk and tools. Only the agent prompt changes. Helpful only allows
+        judgment-based refunds. Verify first requires a successful order and email lookup before
+        any refund attempt.
       </p>
       <div className="grid gap-3">
         <section className="rounded-[14px] border border-[var(--border)] bg-white p-3">

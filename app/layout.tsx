@@ -16,9 +16,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgentGym: Closed-loop adversarial evaluation",
+  title: "AgentGym · adversarial eval lab for support agents",
   description:
-    "Dual-agent simulations, live tool traces, and deterministic policy scoring for support agents.",
+    "Same refund cases. Two prompts. Score the agent on what it tried to do, not how it sounded.",
+  openGraph: {
+    title: "AgentGym · adversarial eval lab for support agents",
+    description:
+      "Same refund cases. Two prompts. Score the agent on what it tried to do, not how it sounded.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "AgentGym · adversarial eval lab for support agents",
+    description:
+      "Same refund cases. Two prompts. Score the agent on what it tried to do, not how it sounded.",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
