@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { CompareScrubber } from "@/components/compare-scrubber";
+import { useMemo, useState } from "react";
 import { ConversationTrace } from "@/components/conversation-trace";
 import { PolicyDiff } from "@/components/policy-diff";
 import { RunControls } from "@/components/run-controls";
 import { ScenarioList } from "@/components/scenario-list";
-import { ShareResult } from "@/components/share-result";
 import { VerdictPanel } from "@/components/verdict-panel";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { getExampleRun, listExampleRuns } from "@/lib/example-runs";
 import { POLICIES } from "@/lib/policies";
@@ -75,43 +74,14 @@ export function Workspace() {
   const [live, setLive] = useState<Record<string, EvalRun>>({});
   const [running, setRunning] = useState(false);
   const [stage, setStage] = useState<LiveStage | null>(null);
-  const [stageStartedAt, setStageStartedAt] = useState<Partial<Record<LiveStage, number>>>({});
-  const [now, setNow] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [compare, setCompare] = useState(false);
-  const [share, setShare] = useState(false);
   const [skipMotion, setSkipMotion] = useState(false);
-  const [episodeBanner, setEpisodeBanner] = useState<EvalRun | null>(null);
-
-  function enterStage(next: LiveStage) {
-    setStage(next);
-    setStageStartedAt((current) =>
-      current[next] != null ? current : { ...current, [next]: Date.now() },
-    );
-  }
 
   const exampleRun = getExampleRun(caseId, version);
   const liveRun = live[liveKey(version, caseId)];
   const selectedRun = mode === "live" ? liveRun ?? null : exampleRun;
-
-  useEffect(() => {
-    if (!compare && !share) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setCompare(false);
-        setShare(false);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [compare, share]);
-
-  useEffect(() => {
-    if (!running) return;
-    const id = window.setInterval(() => setNow(Date.now()), 200);
-    return () => window.clearInterval(id);
-  }, [running]);
 
   const stats = useMemo(() => {
     if (mode === "example") return computeStats(listExampleRuns(version));
@@ -126,10 +96,7 @@ export function Workspace() {
     setRunning(true);
     setError(null);
     setMode("live");
-    setEpisodeBanner(null);
-    setStageStartedAt({});
-    setNow(Date.now());
-    enterStage("Synthesizing adversarial customer");
+    setStage("Synthesizing adversarial customer");
     try {
       const response = await fetch("/api/evaluate-case", {
         method: "POST",
@@ -141,8 +108,6 @@ export function Workspace() {
         const payload: unknown = await response.json();
         if (isEvalRun(payload)) {
           setLive((current) => ({ ...current, [liveKey(version, caseId)]: payload }));
-          setEpisodeBanner(payload);
-          window.setTimeout(() => setEpisodeBanner(null), 4200);
           if (payload.status === "error") setError(errorCopy(payload.errorCode));
         } else {
           setError(errorCopy(response.status === 429 ? "quota_exceeded" : "provider_error"));
@@ -172,7 +137,7 @@ export function Workspace() {
           }
           if (isRecord(payload) && payload.type === "stage") {
             const nextStage = STAGES.find((item) => item === payload.stage);
-            if (nextStage) enterStage(nextStage);
+            if (nextStage) setStage(nextStage);
           }
           if (isRecord(payload) && payload.type === "result" && isEvalRun(payload.run)) {
             latest = payload.run;
@@ -184,8 +149,6 @@ export function Workspace() {
         return;
       }
       setLive((current) => ({ ...current, [liveKey(version, caseId)]: latest }));
-      setEpisodeBanner(latest);
-      window.setTimeout(() => setEpisodeBanner(null), 4200);
       if (latest.status === "error") {
         setError(errorCopy(latest.errorCode));
       }
@@ -208,10 +171,8 @@ export function Workspace() {
     }
   }
 
-  const v1 =
-    mode === "live" ? live[liveKey("v1", caseId)] ?? getExampleRun(caseId, "v1") : getExampleRun(caseId, "v1");
-  const v2 =
-    mode === "live" ? live[liveKey("v2", caseId)] ?? getExampleRun(caseId, "v2") : getExampleRun(caseId, "v2");
+  const v1 = mode === "live" ? live[liveKey("v1", caseId)] ?? getExampleRun(caseId, "v1") : getExampleRun(caseId, "v1");
+  const v2 = mode === "live" ? live[liveKey("v2", caseId)] ?? getExampleRun(caseId, "v2") : getExampleRun(caseId, "v2");
 
   return (
     <section id="lab" className="px-4 pb-16 sm:px-6">
@@ -346,37 +307,64 @@ export function Workspace() {
         <RunControls
           running={running}
           stage={stage}
-          stageStartedAt={stageStartedAt}
-          now={now}
           canRun={!running}
-          selectedRun={selectedRun}
-          episodeBanner={episodeBanner}
-          onRun={() => {
-            void runLive();
-          }}
+          onRun={runLive}
           onCompare={() => setCompare(true)}
-          onShare={() => setShare(true)}
           onCopy={copy}
           copied={copied}
         />
       </div>
 
       {compare ? (
-        <CompareScrubber
-          caseName={scenarios.find((item) => item.id === caseId)?.name ?? caseId}
-          helpful={v1}
-          verifyFirst={v2}
-          modeNote={
-            mode === "example"
-              ? " Sample suite results."
-              : " Live results where available, sample suite otherwise."
-          }
-          onClose={() => setCompare(false)}
-        />
-      ) : null}
-
-      {share && selectedRun ? (
-        <ShareResult run={selectedRun} onClose={() => setShare(false)} />
+        <div
+          className="fixed inset-0 z-40 flex items-end justify-center bg-[var(--ink)]/35 p-4 sm:items-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="compare-title"
+          onClick={() => setCompare(false)}
+        >
+          <div
+            className="max-h-[86vh] w-full max-w-4xl overflow-y-auto rounded-[20px] bg-white p-5"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="compare-title" className="text-lg font-semibold text-[var(--ink)]">
+              Compare prompts · {scenarios.find((item) => item.id === caseId)?.name}
+            </h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              Same customer, same order. Different prompts.
+              {mode === "example"
+                ? " Sample suite results."
+                : " Live results where available, sample suite otherwise."}
+            </p>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              {[v1, v2].map((run) => (
+                <section key={run.runId} className="rounded-[16px] border border-[var(--border)] p-3">
+                  <p className="text-[12px] font-medium text-[var(--muted)]">
+                    {POLICIES[run.version].title} · {run.status}
+                  </p>
+                  <p className="mt-1 text-[12px] leading-4 text-[var(--muted)]">
+                    {POLICIES[run.version].summary}
+                  </p>
+                  <ul className="mt-2 space-y-1.5 text-[13px]">
+                    {run.assertions.map((assertion) => (
+                      <li key={assertion.id} className="flex justify-between gap-2">
+                        <span>{assertion.label}</span>
+                        <span className={assertion.passed ? "text-[var(--success)]" : "text-[var(--failure)]"}>
+                          {assertion.passed ? "Pass" : "Fail"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button variant="secondary" onClick={() => setCompare(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </section>
   );
