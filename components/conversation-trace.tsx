@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FailureMoment } from "@/components/failure-moment";
 import { cn } from "@/lib/cn";
 import type { EvalRun, TranscriptEvent } from "@/lib/types";
 
@@ -33,12 +34,6 @@ export function ConversationTrace({
   const skip = skipMotion || (run !== null && skippedId === run.runId);
   const firstFailure = events.findIndex((event) => event.failed);
   const failedAssertion = run?.assertions.find((assertion) => !assertion.passed);
-  const blockedRefund = run?.toolCalls.some(
-    (call) => call.name === "issueRefund" && call.blocked,
-  );
-  const attemptStillFails = run?.assertions.some(
-    (assertion) => assertion.id === "no_refund_before_verification" && !assertion.passed,
-  );
 
   if (!run) {
     return (
@@ -51,9 +46,7 @@ export function ConversationTrace({
   return (
     <div className="flex min-h-[22rem] flex-col">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="text-[12px] font-medium text-[var(--muted)]">
-          Transcript
-        </p>
+        <p className="text-[12px] font-medium text-[var(--muted)]">Transcript</p>
         {!skip ? (
           <button
             type="button"
@@ -68,12 +61,7 @@ export function ConversationTrace({
         ) : null}
       </div>
 
-      {blockedRefund && attemptStillFails ? (
-        <div className="mb-3 rounded-[14px] border border-[var(--failure)]/25 bg-[#fdf6f7] px-3 py-2.5 text-[12px] leading-5 text-[#8a3d46]">
-          The refund was blocked by the ops API, and the attempt still failed the assertion.
-          Scoring watches what the agent tried, not only what succeeded.
-        </div>
-      ) : null}
+      <FailureMoment run={run} />
 
       <ol className="space-y-2.5">
         {events.map((event, index) => {
