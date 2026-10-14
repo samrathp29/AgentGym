@@ -5,6 +5,7 @@ import type { EvalRun, LiveStage, PolicyVersion } from "@/lib/types";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 function isPolicyVersion(value: unknown): value is PolicyVersion {
   return value === "v1" || value === "v2";
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
         toolCalls: [],
         assertions: [],
         durationMs: 0,
-        model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+        model: process.env["GEMINI_MODEL"] ?? "gemini-3.8-flash",
         errorCode: "quota_exceeded",
         message: `Live tests are limited to one at a time. Try again in ${limit.retryAfterSec}s, or explore the example traces.`,
       } satisfies EvalRun & { message: string },
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
             toolCalls: [],
             assertions: [],
             durationMs: 0,
-            model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+            model: process.env["GEMINI_MODEL"] ?? "gemini-3.8-flash",
             errorCode: "provider_error",
           } satisfies EvalRun,
         });

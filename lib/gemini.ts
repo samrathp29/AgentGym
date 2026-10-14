@@ -2,14 +2,14 @@ import "server-only";
 
 import { GoogleGenAI, Type, type FunctionDeclaration } from "@google/genai";
 
-export const DEFAULT_MODEL = "gemini-2.5-flash";
+export const DEFAULT_MODEL = "gemini-3.8-flash";
 
 export function getModelName(): string {
-  return process.env.GEMINI_MODEL?.trim() || DEFAULT_MODEL;
+  return process.env["GEMINI_MODEL"]?.trim() || DEFAULT_MODEL;
 }
 
 export function getGeminiClient(): GoogleGenAI | null {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  const apiKey = process.env["GEMINI_API_KEY"]?.trim();
   if (!apiKey) return null;
   return new GoogleGenAI({ apiKey });
 }

@@ -167,6 +167,7 @@ export async function evaluateCase(params: {
     return client.models.generateContent({
       ...args,
       config: {
+        thinkingConfig: { thinkingBudget: 0 },
         ...args.config,
         abortSignal: params.signal,
       },

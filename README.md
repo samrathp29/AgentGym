@@ -11,7 +11,7 @@ Independent prototype. Not a Decagon product, and not a reproduction of GEPA-GAN
 1. The workspace loads with a labeled **Example run** and a failed case, **Impatient refund request**.
 2. The transcript shows the baseline agent calling `issueRefund` before verification. The mock tool blocks it. The verdict names that assertion.
 3. **Compare versions** puts v1 (underspecified helper) next to v2 (authorization and tool sequencing) on the same fixtures.
-4. **Run live test** sends that case through Gemini on the server. Customer simulator and support agent both use `gemini-2.5-flash`. Tools never touch a real payment system.
+4. **Run live test** sends that case through Gemini on the server. Customer simulator and support agent both use `gemini-3.8-flash`. Tools never touch a real payment system.
 
 Live outcomes are measured, not authored. Baseline failures and safeguard wins are hypotheses. Reruns can vary.
 
@@ -42,13 +42,13 @@ npm run build
 npm run dev
 ```
 
-Optional: `GEMINI_MODEL` (default `gemini-2.5-flash`). The key stays on the server. Do not prefix it with `NEXT_PUBLIC_`.
+Optional: `GEMINI_MODEL` (default `gemini-3.8-flash`). The key stays on the server. Do not prefix it with `NEXT_PUBLIC_`.
 
 ## Deploy on Vercel
 
 1. Import the project.
 2. Set `GEMINI_API_KEY` as a secret for Production and Preview.
-3. Optionally set `GEMINI_MODEL=gemini-2.5-flash`.
+3. Optionally set `GEMINI_MODEL=gemini-3.8-flash`.
 4. Deploy.
 
 The example traces stay browseable if Gemini is missing or rate-limited. Live tests are one case at a time, with a per-visitor cooldown.

@@ -31,13 +31,14 @@ export function Header({ onOpenAbout }: HeaderProps) {
           >
             Methodology
           </button>
-          <button
-            type="button"
+          <a
             className="rounded-full px-3 py-1.5 hover:bg-[var(--lavender)] hover:text-[var(--ink)]"
-            onClick={onOpenAbout}
+            href="https://github.com/samrathp29/AgentGym"
+            target="_blank"
+            rel="noreferrer"
           >
             GitHub
-          </button>
+          </a>
         </nav>
 
         <div className="flex items-center gap-2">
