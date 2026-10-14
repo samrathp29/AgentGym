@@ -20,7 +20,7 @@
   --color-border: var(--border);
   --color-success: var(--success);
   --color-failure: var(--failure);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-satoshi);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -37,7 +37,7 @@ html {
 body {
   background: var(--background);
   color: var(--ink);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
 }
 
 :focus-visible {
