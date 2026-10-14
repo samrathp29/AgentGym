@@ -21,47 +21,29 @@ export function AboutPanel({ open, onClose }: AboutPanelProps) {
         className="max-h-[86vh] w-full max-w-xl overflow-y-auto rounded-[20px] bg-white p-5 shadow-xl sm:p-6"
         onClick={(event) => event.stopPropagation()}
       >
-        <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--violet)] uppercase">
-          About this experiment
+        <p className="text-[13px] font-medium text-[var(--violet)]">
+          Methodology
         </p>
         <h2 id="about-title" className="mt-2 text-xl font-semibold tracking-tight text-[var(--ink)]">
-          A miniature adversarial lab, not a benchmark
+          How AgentGym grades a support agent
         </h2>
         <div className="mt-4 space-y-3 text-sm leading-6 text-[var(--muted)]">
           <p>
-            AgentGym runs six Aster Audio refund cases against a support agent. The customer
-            simulator and the agent both use Gemini. Tools are mock functions on the server.
-            Assertions are deterministic reads of those tool traces, not an LLM judge.
+            Six Aster Audio refund cases hit a support agent. Gemini plays both the customer and
+            the agent. The agent calls the same three ops tools a desk would use: lookupOrder,
+            issueRefund, and createEscalation.
           </p>
           <p>
-            Baseline (v1) vs safeguard (v2) is a hypothesis. Live reruns can vary. Example runs are
-            authored sample data so the story is visible even when the Gemini quota is exhausted.
+            Those tools write to a real order catalog, refund ledger, and ticket queue for the
+            Aster Audio tenant. Each live run clones a fresh ledger so one test cannot contaminate
+            the next. The API still enforces verification, the 30-day window, the $100 cap, and
+            no double refunds. A blocked call is still an attempt, and that is what the grader
+            reads.
           </p>
           <p>
-            Independent prototype. Not a Decagon product, not a reproduction of GEPA-GAN or
-            DuetBench-2. Visual language is inspired by Decagon&apos;s public site, not copied from
-            it.
-          </p>
-          <ul className="list-disc space-y-1 pl-5">
-            <li>
-              <a className="text-[var(--violet)] hover:underline" href="https://decagon.ai/blog/gepa-gan-teaching-ai-to-sound-human">
-                GEPA-GAN
-              </a>
-            </li>
-            <li>
-              <a className="text-[var(--violet)] hover:underline" href="https://decagon.ai/blog/duetbench-2">
-                DuetBench-2
-              </a>
-            </li>
-            <li>
-              <a className="text-[var(--violet)] hover:underline" href="https://decagon.ai/blog/the-next-generation-of-simulations">
-                Simulations
-              </a>
-            </li>
-          </ul>
-          <p>
-            Live calls send only fictional scenario text to Google&apos;s Gemini API. Google may use
-            unpaid API content to improve its products. No real customer data is involved.
+            Assertions are deterministic over the tool trace. There is no LLM judge. Baseline (v1)
+            vs safeguard (v2) is a hypothesis. Live reruns can vary. Example runs are authored
+            sample data so the story stays visible if the live path is down.
           </p>
         </div>
         <div className="mt-5 flex justify-end">

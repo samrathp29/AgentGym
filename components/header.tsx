@@ -31,19 +31,11 @@ export function Header({ onOpenAbout }: HeaderProps) {
           >
             Methodology
           </button>
-          <a
-            className="rounded-full px-3 py-1.5 hover:bg-[var(--lavender)] hover:text-[var(--ink)]"
-            href="https://github.com/samrathp29/AgentGym"
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub
-          </a>
         </nav>
 
         <div className="flex items-center gap-2">
-          <span className="hidden rounded-full border border-[var(--border)] bg-white px-3 py-1 text-[11px] font-medium tracking-wide text-[var(--muted)] uppercase sm:inline">
-            Independent experiment
+          <span className="hidden rounded-full border border-[var(--border)] bg-white px-3 py-1 text-[12px] font-medium text-[var(--muted)] sm:inline">
+            Aster Audio
           </span>
           <Button variant="ghost" size="sm" className="sm:hidden" onClick={onOpenAbout}>
             About

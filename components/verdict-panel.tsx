@@ -14,7 +14,7 @@ export function VerdictPanel({ run }: VerdictPanelProps) {
       <div className="rounded-[14px] border border-[#ecdcc8] bg-[#fbf6ef] px-3 py-3 text-sm text-[#7a5428]">
         This live request did not finish, so it is not counted as a policy failure.
         {run.errorCode === "quota_exceeded"
-          ? " Free Gemini quota reached — explore the example traces."
+          ? " Free Gemini quota reached. Explore the example traces."
           : run.errorCode === "timeout"
             ? " The model call timed out."
             : " The provider returned an error."}
@@ -33,7 +33,7 @@ export function VerdictPanel({ run }: VerdictPanelProps) {
             {assertion.label}
             <span
               className={cn(
-                "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase",
+                "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
                 assertion.passed
                   ? "bg-[#e5f4ee] text-[var(--success)]"
                   : "bg-[#f8e8ea] text-[var(--failure)]",

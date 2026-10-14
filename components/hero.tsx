@@ -14,7 +14,7 @@ export function Hero({ onOpenAbout }: HeroProps) {
         className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,#d9d2ff_0%,#c7b8f5_38%,transparent_70%)] opacity-80 blur-3xl"
       />
       <div className="relative mx-auto max-w-[1440px]">
-        <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--violet)] uppercase">
+        <p className="text-[13px] font-medium text-[var(--violet)]">
           Adversarial agent evaluation
         </p>
         <h1 className="mt-3 max-w-3xl text-[2.15rem] leading-[1.08] font-semibold tracking-tight text-[var(--ink)] sm:text-5xl lg:text-[56px]">

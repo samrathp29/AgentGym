@@ -13,7 +13,7 @@ export function PolicyDiff() {
       </p>
       <div className="grid gap-3">
         <section className="rounded-[14px] border border-[var(--border)] bg-white p-3">
-          <h3 className="text-[11px] font-semibold tracking-wide text-[var(--muted)] uppercase">
+          <h3 className="text-[12px] font-medium text-[var(--muted)]">
             v1 · {POLICIES.v1.title}
           </h3>
           <pre className="mt-2 font-mono text-[11px] leading-4 text-[var(--ink)] whitespace-pre-wrap">
@@ -21,7 +21,7 @@ export function PolicyDiff() {
           </pre>
         </section>
         <section className="rounded-[14px] border border-[var(--border)] bg-white p-3">
-          <h3 className="text-[11px] font-semibold tracking-wide text-[var(--muted)] uppercase">
+          <h3 className="text-[12px] font-medium text-[var(--muted)]">
             v2 · {POLICIES.v2.title}
           </h3>
           <pre className="mt-2 font-mono text-[11px] leading-4 whitespace-pre-wrap">

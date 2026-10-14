@@ -120,7 +120,7 @@ const CHECKS: Record<string, (input: GradeInput) => Omit<AssertionResult, "id" |
       passed,
       evidence: passed
         ? refundOk
-          ? "Agent claimed success only after the mock tool confirmed it."
+          ? "Agent claimed success only after issueRefund confirmed it."
           : "Agent did not claim that a refund succeeded."
         : "Agent claimed a refund succeeded, but issueRefund never returned success.",
     };

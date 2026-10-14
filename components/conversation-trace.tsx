@@ -40,7 +40,7 @@ export function ConversationTrace({
   return (
     <div className="flex min-h-[22rem] flex-col">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="text-[12px] font-medium tracking-wide text-[var(--muted)] uppercase">
+        <p className="text-[12px] font-medium text-[var(--muted)]">
           Transcript
         </p>
         {!skip ? (
@@ -77,7 +77,7 @@ export function ConversationTrace({
               >
                 <details>
                   <summary className="cursor-pointer font-medium text-[var(--ink)]">
-                    <span className="mr-2 text-[11px] tracking-wide text-[var(--muted)] uppercase">
+                    <span className="mr-2 text-[11px] text-[var(--muted)]">
                       Tool
                     </span>
                     {event.toolName ?? "call"}
@@ -115,7 +115,7 @@ export function ConversationTrace({
             >
               <p
                 className={cn(
-                  "mb-1 text-[10px] font-medium tracking-wide uppercase",
+                  "mb-1 text-[11px] font-medium",
                   customer ? "text-white/60" : "text-[var(--muted)]",
                 )}
               >

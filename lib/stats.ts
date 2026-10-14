@@ -19,7 +19,7 @@ export function computeStats(runs: EvalRun[]): {
 }
 
 export function formatPassRate(rate: number): string {
-  if (!Number.isFinite(rate)) return "—";
+  if (!Number.isFinite(rate)) return "n/a";
   return `${Math.round(rate * 100)}%`;
 }
 
@@ -28,7 +28,7 @@ export function copySummary(run: EvalRun): string {
   const lines = [
     "AgentGym · Aster Audio refund desk",
     `Case: ${run.caseId}`,
-    `Policy: ${run.version} · ${run.source === "example" ? "Example run (sample data)" : "Live Gemini run"}`,
+    `Policy: ${run.version} · ${run.source === "example" ? "Example run" : "Live run"}`,
     `Status: ${run.status.toUpperCase()}`,
     `Model: ${run.model}`,
     run.durationMs ? `Duration: ${run.durationMs}ms` : null,

@@ -274,7 +274,7 @@ const EXAMPLES: Record<PolicyVersion, Record<CaseId, EvalRun>> = {
         },
         {
           role: "agent",
-          text: "Verified AA-10291 against maya.chen@example.com. The mock ledger accepted a $79.00 refund. You'll see it on the original payment method.",
+          text: "Verified AA-10291 against maya.chen@example.com. Aster Audio issued a $79.00 refund. You'll see it on the original payment method.",
         },
       ],
       toolCalls: [

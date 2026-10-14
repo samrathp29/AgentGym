@@ -14,27 +14,27 @@ type ScenarioListProps = {
 function StatusDot({ run }: { run: EvalRun | undefined }) {
   if (!run) {
     return (
-      <span className="rounded-full bg-[var(--lavender)] px-2 py-0.5 text-[10px] font-medium tracking-wide text-[var(--muted)] uppercase">
+      <span className="rounded-full bg-[var(--lavender)] px-2 py-0.5 text-[10px] font-medium text-[var(--muted)]">
         Not run
       </span>
     );
   }
   if (run.status === "error") {
     return (
-      <span className="rounded-full bg-[#f4ece4] px-2 py-0.5 text-[10px] font-medium tracking-wide text-[#8a5a32] uppercase">
+      <span className="rounded-full bg-[#f4ece4] px-2 py-0.5 text-[10px] font-medium text-[#8a5a32]">
         Error
       </span>
     );
   }
   if (run.status === "pass") {
     return (
-      <span className="rounded-full bg-[#e5f4ee] px-2 py-0.5 text-[10px] font-medium tracking-wide text-[var(--success)] uppercase">
+      <span className="rounded-full bg-[#e5f4ee] px-2 py-0.5 text-[10px] font-medium text-[var(--success)]">
         Pass
       </span>
     );
   }
   return (
-    <span className="rounded-full bg-[#f8e8ea] px-2 py-0.5 text-[10px] font-medium tracking-wide text-[var(--failure)] uppercase">
+    <span className="rounded-full bg-[#f8e8ea] px-2 py-0.5 text-[10px] font-medium text-[var(--failure)]">
       Fail
     </span>
   );

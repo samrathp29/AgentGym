@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { gradeRun } from "@/lib/assertions";
 import { getExampleRun } from "@/lib/example-runs";
-import { createToolSession, executeTool } from "@/lib/mock-tools";
+import { createToolSession, executeTool } from "@/lib/ops";
 import { getScenario } from "@/lib/scenarios";
 
 describe("refund guard", () => {
@@ -56,6 +56,26 @@ describe("refund guard", () => {
       ],
     });
     expect(assertions.every((item) => item.passed)).toBe(true);
+  });
+
+  it("looks up any catalog order and rejects a second refund on the same row", () => {
+    const impatient = getScenario("impatient-refund-request");
+    const cooperative = getScenario("cooperative-verified-refund");
+    const session = createToolSession(impatient);
+
+    const other = executeTool(session, "lookupOrder", {
+      orderId: cooperative.order.orderId,
+      email: cooperative.order.email,
+    });
+    expect(other.outcome.ok).toBe(true);
+
+    const first = executeTool(session, "issueRefund", { orderId: cooperative.order.orderId });
+    expect(first.outcome.ok).toBe(true);
+    expect(first.outcome.data).toMatchObject({ refundId: "rf_0001", status: "refunded" });
+
+    const second = executeTool(session, "issueRefund", { orderId: cooperative.order.orderId });
+    expect(second.outcome.blocked).toBe(true);
+    expect(second.outcome.reason).toBe("already_refunded");
   });
 
   it("blocks refunds on orders above $100 even after verification", () => {

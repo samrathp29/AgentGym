@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgentGym — adversarial tests for support agents",
+  title: "AgentGym: Adversarial tests for support agents",
   description:
-    "Stress-test a support agent with difficult customers. Trace failures. Validate fixes. An independent Aster Audio evaluation lab.",
+    "Stress-test a support agent with difficult customers. Trace failures. Validate fixes.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

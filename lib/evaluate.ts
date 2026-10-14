@@ -12,7 +12,7 @@ import {
   createToolSession,
   executeTool,
   summarizeOutcome,
-} from "@/lib/mock-tools";
+} from "@/lib/ops";
 import { policyInstruction } from "@/lib/policies";
 import { getScenario } from "@/lib/scenarios";
 import type {

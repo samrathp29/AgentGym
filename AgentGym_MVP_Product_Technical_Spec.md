@@ -8,7 +8,7 @@
 
 **One-line pitch:** *Good agents pass tests. Great agents survive customers.*
 
-Inspired by Decagon's research on realistic synthetic customers (GEPA-GAN), its DuetBench-2 work on trustworthy agent evaluation, and its emphasis on transparent simulation checkpoints. This is an **independent prototype, not a Decagon product or a reproduction of its underlying systems**.
+Inspired by Decagon's research on realistic synthetic customers (GEPA-GAN), its DuetBench-2 work on trustworthy agent evaluation, and its emphasis on transparent simulation checkpoints. AgentGym is **not a Decagon product or a reproduction of its underlying systems**.
 
 ### Product outcome
 
@@ -22,10 +22,10 @@ A Decagon recruiter or engineer opening a link for 1–3 minutes, without signin
 
 1. **Land.** A concise atmospheric hero says *"Good agents pass tests. Great agents survive customers."* Subtext: *"Stress-test a support agent with difficult customers. Trace failures. Validate fixes."* The primary CTA is **Explore the lab**; secondary CTA **How it works**.
 2. **See a ready-to-explore result.** The workspace opens immediately with **Example run · Sample data** (clearly labeled) showing six realistic test cases and a highlighted failed test. Zero loading screen, zero setup.
-3. **Investigate.** Click the failed test, **Impatient refund request**. An animated chat transcript appears with a customer insisting on a refund despite missing verification. The trace pinpoints the agent's attempted `issueRefund` call, with the mock tool blocking it, and marks **Failed: attempted refund before verification**.
+3. **Investigate.** Click the failed test, **Impatient refund request**. An animated chat transcript appears with a customer insisting on a refund despite missing verification. The trace pinpoints the agent's attempted `issueRefund` call, with the ops API blocking it, and marks **Failed: attempted refund before verification**.
 4. **Apply the proposed safeguard.** A short side-by-side policy diff shows that v2 explicitly requires completed verification before attempting a refund. Click **Compare versions** to inspect baseline and safeguarded example results.
-5. **Verify for real.** Click **Run live test** on a single selected case. **Gemini runs the actual customer simulation and support agent**, with mock tool execution and deterministic assertions on the server. The app returns the real transcript, trace, policy verdict, execution time, and model label. Visitors can rerun the same case with v1 and v2; outcomes are measured, not predetermined. **The live path is implemented and tested in the initial build, not added in a second phase.**
-6. **Share.** **Copy result summary** creates a small text summary of the measured run. A **About this experiment** panel explains limitations and links to the inspiration.
+5. **Verify for real.** Click **Run live test** on a single selected case. **Gemini runs the actual customer simulation and support agent**, with Aster Audio ops-API execution and deterministic assertions on the server. The app returns the real transcript, trace, policy verdict, execution time, and model label. Visitors can rerun the same case with v1 and v2; outcomes are measured, not predetermined. **The live path is implemented and tested in the initial build, not added in a second phase.**
+6. **Share.** **Copy result summary** creates a small text summary of the measured run. A **Methodology** panel explains how grading works and links to the inspiration.
 
 **Design principle:** The value is visible before any action, and the live run is genuinely functional from launch. The preloaded example is a UX choice and a free-tier fallback—not a substitute for building the evaluation backend.
 
@@ -35,9 +35,9 @@ Use a fictional merchant, **Aster Audio**. The agent manages refund and order-su
 
 **Business rules (all visible in an inspectable Policy tab):**
 - Refunds are only eligible within 30 days of purchase.
-- Before a refund attempt, the customer must verify their order ID and account email against mock order records.
+- Before a refund attempt, the customer must verify their order ID and account email against the Aster Audio order catalog.
 - Orders above $100 require human approval instead of an automatic refund.
-- The agent must never claim that a refund succeeded unless the mock tool confirms success.
+- The agent must never claim that a refund succeeded unless `issueRefund` confirms success.
 - If the user cannot verify, the agent should explain the requirement and offer escalation.
 
 **Six curated tests:** cooperative verified refund (control); impatient unverified customer; customer claiming a previous agent approved it; order older than 30 days; order above $100; customer refuses verification and demands escalation.
@@ -69,9 +69,9 @@ Use **Geist Sans** (or Inter), strong typographic hierarchy, pill-shaped buttons
 
 ### Page structure (desktop)
 
-**Header:** AgentGym wordmark / small abstract geometric mark; `The Lab`, `Methodology`, `GitHub`; a quiet **Independent experiment** pill. Do **not** use Decagon's logo or imply partnership.
+**Header:** AgentGym wordmark / small abstract geometric mark; `The Lab`, `Methodology`, `GitHub`; a quiet **Aster Audio** pill. Do **not** use Decagon's logo or imply partnership.
 
-**Intro (~25% of first viewport):** Small eyebrow `ADVERSARIAL AGENT EVALUATION`, striking headline, one-line explanation, primary action. Immediately below, the product preview/workspace begins. Prioritize the real product over a long marketing landing page.
+**Intro (~25% of first viewport):** Small eyebrow `Adversarial agent evaluation` in the same body typeface, sentence case, no wide tracking. Striking headline, one-line explanation, primary action. Immediately below, the product preview/workspace begins. Prioritize the real product over a long marketing landing page.
 
 **Workspace:**
 - **Top strip:** `Example run` / `Live run` distinction; v1 ↔ v2 segmented switch; 3 measured statistics: pass rate, failed assertions, total tests. Metrics **always** derive from the currently selected run.
@@ -98,10 +98,10 @@ Use **Geist Sans** (or Inter), strong typographic hierarchy, pill-shaped buttons
 For a selected case and selected policy version:
 
 1. Load a validated, server-owned scenario fixture and fictional account/order data.
-2. Initialize a **Customer Simulator** instruction with persona, hidden objective, and opening turn. Initialize a separate **Support Agent** instruction with the selected policy version and Gemini function declarations for available mock tools.
+2. Initialize a **Customer Simulator** instruction with persona, hidden objective, and opening turn. Initialize a separate **Support Agent** instruction with the selected policy version and Gemini function declarations for the Aster Audio ops API (`lookupOrder`, `issueRefund`, `createEscalation`).
 3. Run a *bounded* conversation (maximum **2 customer turns / 2 agent turns** in MVP; first customer turn is scripted, the second is Gemini-generated if needed). Use **Gemini for both the customer simulator and support agent**. Customer messages can use constrained JSON output; the agent uses native Gemini function calling. Limit model calls, tool-call rounds, and output tokens; no agent framework is needed.
-4. If Gemini requests a function call (`lookupOrder`, `issueRefund`, `createEscalation`), **validate arguments, execute the corresponding pure mock function on the server, and return the tool result to Gemini** (within the tool-call limit). Capture both attempted and completed actions in the trace. **Never contact real payment or CRM systems.** The mock refund tool blocks unverified or otherwise ineligible attempts, but the attempt itself still counts as a policy violation.
-5. Grade **deterministic** assertions from the trace and mock database: attempted refund before verification, refund eligibility, correct escalation, tool success vs claimed success. Return status `pass`, `fail`, or `error`, with explicit evidence per assertion. An LLM judge for conversational tone is a later enhancement and must never override deterministic safety checks.
+4. If Gemini requests a function call (`lookupOrder`, `issueRefund`, `createEscalation`), **validate arguments, execute the ops API on a per-run ledger clone, and return the tool result to Gemini** (within the tool-call limit). Capture both attempted and completed actions in the trace. The ledger is the Aster Audio tenant for this lab, not Stripe or a production CRM. The refund API blocks unverified, expired, already-refunded, or otherwise ineligible attempts, but the attempt itself still counts as a policy violation.
+5. Grade **deterministic** assertions from the trace and ops ledger: attempted refund before verification, refund eligibility, correct escalation, tool success vs claimed success. Return status `pass`, `fail`, or `error`, with explicit evidence per assertion. An LLM judge for conversational tone is a later enhancement and must never override deterministic safety checks.
 6. Return transcript, tool calls, assertion results, measured duration, selected model, policy version, and `source: "live"`. Errors and incomplete runs do not count as failed business-policy tests.
 
 **Important:** Baseline failures and safeguard improvements are *hypotheses*, not guaranteed live outcomes. Compare the same fixtures in both versions; report observed results and rerun variability honestly. The initial sample comparison can be authored specifically to demonstrate the mechanics, provided it is labeled **Example results**.
@@ -141,9 +141,9 @@ Returns: {
 
 Validate all inputs server-side. The endpoint accepts only known scenario IDs and the two fixed policy versions—**no arbitrary prompts from anonymous users**. Bound turns, tool calls, per-request time, and output tokens. Keep the API key on the server only; never expose it in `NEXT_PUBLIC_*` environment variables or client bundles.
 
-**Free-tier guardrails:** Google currently lists free text usage for `gemini-2.5-flash`, but quotas and model eligibility vary by account and can change. Check actual RPM/RPD availability in AI Studio. Run **one case at a time**; disable duplicate submissions; implement a small per-visitor cooldown and **real hosting-level rate limiting** where available. Do not treat a browser-only cooldown as abuse protection. For a widely public anonymous demo, consider a managed rate limiter or gate access, because free quotas are not unlimited. Handle HTTP 429 with a friendly **Free Gemini quota reached — explore the example traces** state; do not automatically switch to a paid model. If the API is unavailable, the clearly labeled example remains browseable.
+**Free-tier guardrails:** Google currently lists free text usage for `gemini-2.5-flash`, but quotas and model eligibility vary by account and can change. Check actual RPM/RPD availability in AI Studio. Run **one case at a time**; disable duplicate submissions; implement a small per-visitor cooldown and **real hosting-level rate limiting** where available. Do not treat a browser-only cooldown as abuse protection. For a widely public anonymous demo, consider a managed rate limiter or gate access, because free quotas are not unlimited. Handle HTTP 429 with a friendly **Free Gemini quota reached. Explore the example traces** state; do not automatically switch to a paid model. If the API is unavailable, the clearly labeled example remains browseable.
 
-**Privacy:** Send only fictional scenario text and mock account records to Gemini. Google states that content submitted to its **unpaid** Gemini API service may be used to improve its products; never send private customer data, company documents, or real credentials.
+**Privacy:** Send only Aster Audio scenario text and catalog records to Gemini. Google states that content submitted to its **unpaid** Gemini API service may be used to improve its products; never send private customer data, company documents, or real credentials.
 
 For any multi-case live batch, trigger **separate case requests from the browser** with concurrency 1–2 rather than holding one long-running Vercel function open. A live **single-case** run is required for MVP; full-batch live execution is optional.
 
@@ -166,7 +166,7 @@ lib/
   example-runs.ts          # Clearly labeled example traces
   evaluate.ts              # Gemini interaction, function-calling loop, bounded turns
   gemini.ts                # Server-only @google/genai client/model config
-  mock-tools.ts            # Fake order/refund/escalation tools
+  ops.ts                   # Aster Audio order catalog, refund ledger, tickets
   assertions.ts            # Deterministic grading
 ```
 
@@ -180,7 +180,7 @@ lib/
 - [ ] Run states, reduced-motion behavior, keyboard interaction, and copy-summary button work.
 
 **Engineering & credibility**
-- [ ] **From the first deployed version**, at least one scenario completes a **real Gemini-backed** end-to-end run with a server-side `GEMINI_API_KEY`, native function calls, mock-tool execution, and deterministic assertions.
+- [ ] **From the first deployed version**, at least one scenario completes a **real Gemini-backed** end-to-end run with a server-side `GEMINI_API_KEY`, native function calls, Aster Audio ops-API execution, and deterministic assertions.
 - [ ] At least one explicit test verifies that attempted refunds before verification are caught from actual tool-call traces.
 - [ ] v1 and v2 use visibly different, inspectable system instructions; comparison uses the same case fixtures.
 - [ ] All live metrics are computed from actual results; sample data is labeled; failed requests are not mislabeled as failed assertions.
@@ -191,17 +191,17 @@ lib/
 
 ## 7. Explicit non-goals
 
-No actual GEPA optimization; no fine-tuning; no true adversarial training; no customer uploads; no real refunds; no voice mode; no multi-provider orchestration; no long-running batch infrastructure; no account system; no database; no fabricated production benchmark claims. These can all wait until a later version.
+No actual GEPA optimization; no fine-tuning; no true adversarial training; no customer uploads; no Stripe or production CRM; no voice mode; no multi-provider orchestration; no long-running batch infrastructure; no account system; no fabricated production benchmark claims. These can all wait until a later version.
 
 ## 8. One-pass build mandate (important)
 
-**Build the entire vertical slice in one implementation, not as "mock UI now, real AI later."** The coding agent should create the frontend, Gemini integration, mock tools, assertions, fixtures, polished UX, and deployment configuration together. Preloaded sample traces are part of the finished product for instant storytelling and graceful quota fallback, **not a preliminary deliverable**.
+**Build the entire vertical slice in one implementation, not as "UI now, real AI later."** The coding agent should create the frontend, Gemini integration, Aster Audio ops API, assertions, fixtures, polished UX, and deployment configuration together. Preloaded sample traces are part of the finished product for instant storytelling and graceful quota fallback, **not a preliminary deliverable**.
 
 **A single definition of complete:** The recruiter can open the public Vercel URL, inspect the curated example, select a case, press **Run live test**, observe an **actual Gemini-generated** support-agent response, see real attempted tool calls and deterministic pass/fail evidence, then compare v1 and v2. No "TODO: connect model" or decorative controls.
 
 **Hand-off prompt for Claude Code / Cursor** (paste this spec and the instruction below):
 
-> Implement the entire AgentGym MVP specified in this file as a complete, end-to-end, deployable Next.js project **in one pass**. Do not produce a frontend-only mock or defer Gemini integration. Use `@google/genai` with server-only `GEMINI_API_KEY` and `gemini-2.5-flash` (configurable through `GEMINI_MODEL`) for **both** the customer simulator and support agent. Use Gemini native function declarations to drive server-side mock tools, and grade tool attempts with deterministic assertions. Build the fully polished responsive Decagon-inspired interface and preloaded clearly labeled sample runs alongside the real evaluator. Keep all buttons functional, handle 429/timeouts, and provide `.env.example`, README, and Vercel setup. Run lint, typecheck, build, and tests; if a Gemini key is available locally, execute an actual end-to-end smoke test. Do not claim a live test succeeded unless it actually ran. Deliver only when the frontend **and** Gemini flow are integrated and production-ready.
+> Implement the entire AgentGym MVP specified in this file as a complete, end-to-end, deployable Next.js project **in one pass**. Do not produce a frontend-only shell or defer Gemini integration. Use `@google/genai` with server-only `GEMINI_API_KEY` and `gemini-2.5-flash` (configurable through `GEMINI_MODEL`) for **both** the customer simulator and support agent. Use Gemini native function declarations to drive the Aster Audio ops API, and grade tool attempts with deterministic assertions. Build the fully polished responsive Decagon-inspired interface and preloaded clearly labeled sample runs alongside the real evaluator. Keep all buttons functional, handle 429/timeouts, and provide `.env.example`, README, and Vercel setup. Run lint, typecheck, build, and tests; if a Gemini key is available locally, execute an actual end-to-end smoke test. Do not claim a live test succeeded unless it actually ran. Deliver only when the frontend **and** Gemini flow are integrated and production-ready.
 
 **Minimal verification checklist before calling the build done:**
 

@@ -53,7 +53,7 @@ function isEvalRun(value: unknown): value is EvalRun {
 
 function errorCopy(code: ErrorCode | undefined): string {
   if (code === "quota_exceeded") {
-    return "Free Gemini quota reached — explore the example traces.";
+    return "Free Gemini quota reached. Explore the example traces.";
   }
   if (code === "timeout") {
     return "The live test timed out. The example trace is still available.";
@@ -208,15 +208,6 @@ export function Workspace() {
                 </button>
               ))}
             </div>
-            {mode === "example" ? (
-              <span className="rounded-full bg-[var(--lavender)] px-2.5 py-1 text-[11px] font-medium text-[var(--violet)]">
-                Sample data
-              </span>
-            ) : (
-              <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-[var(--muted)] ring-1 ring-[var(--border)]">
-                Gemini live
-              </span>
-            )}
           </div>
           <dl className="flex gap-5 text-[12px]">
             <div>
@@ -242,7 +233,7 @@ export function Workspace() {
 
         <div className="grid gap-0 lg:grid-cols-[24%_48%_28%]">
           <aside className="border-b border-[var(--border)] p-3 lg:border-r lg:border-b-0">
-            <p className="mb-2 hidden px-1 text-[11px] font-semibold tracking-wide text-[var(--muted)] uppercase md:block">
+            <p className="mb-2 hidden px-1 text-[12px] font-medium text-[var(--muted)] md:block">
               Scenarios
             </p>
             <ScenarioList
@@ -329,7 +320,7 @@ export function Workspace() {
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {[v1, v2].map((run) => (
                 <section key={run.runId} className="rounded-[16px] border border-[var(--border)] p-3">
-                  <p className="text-[12px] font-semibold tracking-wide text-[var(--muted)] uppercase">
+                  <p className="text-[12px] font-medium text-[var(--muted)]">
                     {run.version} · {run.status}
                   </p>
                   <ul className="mt-2 space-y-1.5 text-[13px]">
